@@ -48,10 +48,10 @@ jobs:
       - setup_remote_docker
       - run:
           name: build
-          command: docker-compose build base-api-test
+          command: docker-compose build aws-multi-account-test-api-test
       - run:
           name: Run tests
-          command: docker-compose run base-api-test
+          command: docker-compose run aws-multi-account-test-api-test
 
   deploy-to-development:
     docker:
@@ -59,26 +59,8 @@ jobs:
     steps:
       - deploy-env:
           cluster-name: "$DEVELOPMENT_CLUSTER"
-          service-name: 'base-api-development'
+          service-name: 'aws-multi-account-test-api-development'
           image-tag: "$CIRCLE_SHA1"
-
-  deploy-to-staging:
-    docker:
-      - image: circleci/python:3.7
-    steps:
-      - deploy-env:
-          cluster-name: "$STAGING_CLUSTER"
-          service-name: 'base-api-staging'
-          image-tag: "$CIRCLE_SHA1"
-
-  deploy-to-production:
-    docker:
-      - image: circleci/python:3.7
-    steps:
-      - deploy-env:
-          cluster-name: "$PRODUCTION_CLUSTER"
-          service-name: 'base-api-production'
-          image-tag: "$AWS_ECR_HOST/$AWS_ECR_PATH:$CIRCLE_SHA1"
 
 workflows:
   build-and-deploy:
@@ -86,8 +68,8 @@ workflows:
       - check
       - aws-ecr/build_and_push_image:
           name: build_and_push_image
-          dockerfile: ./base-api/Dockerfile
-          path: ./base-api
+          dockerfile: ./aws-multi-account-test-api/Dockerfile
+          path: ./aws-multi-account-test-api
           account-url: AWS_ECR_HOST
           repo: $AWS_ECR_PATH
           aws-access-key-id: AWS_ACCESS_KEY_ID
@@ -102,36 +84,6 @@ workflows:
           requires:
             - check
             - build_and_push_image
-          filters:
-            branches:
-              only: master
-
-      - permit-staging-release:
-          type: approval
-          requires:
-            - deploy-to-development
-          filters:
-            branches:
-              only: master
-
-      - deploy-to-staging:
-          requires:
-            - permit-staging-release
-          filters:
-            branches:
-              only: master
-
-      - permit-production-release:
-          type: approval
-          requires:
-            - deploy-to-staging
-          filters:
-            branches:
-              only: master
-
-      - deploy-to-production:
-          requires:
-            - permit-production-release
           filters:
             branches:
               only: master

@@ -60,3 +60,4 @@ bin/
 tmp/
 .vs/
 /base-api.Tests/Properties/launchSettings.json
+*.dockerignore
