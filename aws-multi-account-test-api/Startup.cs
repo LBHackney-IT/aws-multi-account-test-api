@@ -11,8 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using aws_multi_account_test_api.UseCase.V1;
 using aws_multi_account_test_api.V1.Boundary;
-using aws_multi_account_test_api.V1.Gateways;
-using aws_multi_account_test_api.V1.Infrastructure;
+
 using aws_multi_account_test_api.Versioning;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -92,9 +91,7 @@ namespace aws_multi_account_test_api
                 if (File.Exists(xmlPath))
                     c.IncludeXmlComments(xmlPath);
             });
-            ConfigureDbContext(services);
-            RegisterGateWays(services);
-            RegisterUseCases(services);
+            ConfigureDbContext(services);      
         }
 
         private static void ConfigureDbContext(IServiceCollection services)
@@ -106,17 +103,6 @@ namespace aws_multi_account_test_api
 
             //services.AddSingleton<IUHContext>(s => new UhContext(builder.Options));
         }
-
-        private static void RegisterGateWays(IServiceCollection services)
-        {
-            services.AddSingleton<ITransactionsGateway, TransactionsGateway>();
-        }
-
-        private static void RegisterUseCases(IServiceCollection services)
-        {
-            services.AddSingleton<IListTransactions, ListTransactionsUsecase>();
-        }
-
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
